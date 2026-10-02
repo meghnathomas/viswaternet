@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/tylertrimble/visnet/issues.
+Report bugs at https://github.com/tylertrimble/viswaternet/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,36 +38,36 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-visnet could always use more documentation, whether as part of the
-official visnet docs, in docstrings, or even on the web in blog posts,
+VisWaterNet could always use more documentation, whether as part of the
+official VisWaterNet docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/tylertrimble/visnet/issues.
+The best way to send feedback is to file an issue at https://github.com/tylertrimble/viswaternet/issues.
 
 If you are proposing a feature:
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
 * Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
+  are welcome :-)
 
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `visnet` for local development.
+Ready to contribute? Here's how to set up `viswaternet` for local development.
 
-1. Fork the `visnet` repo on GitHub.
+1. Fork the `viswaternet` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/visnet.git
+    $ git clone git@github.com:your_name_here/viswaternet.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-    $ mkvirtualenv visnet
-    $ cd visnet/
+    $ mkvirtualenv viswaternet
+    $ cd viswaternet/
     $ python setup.py develop
 
 4. Create a branch for local development::
@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `visnet` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the
    tests, including testing other Python versions with tox::
 
-    $ flake8 visnet tests
+    $ flake8 viswaternet tests
     $ python setup.py test or pytest
     $ tox
 
@@ -102,9 +102,6 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
-   https://travis-ci.com/tylertrimble/visnet/pull_requests
-   and make sure that the tests pass for all supported Python versions.
 
 Tips
 ----
@@ -112,7 +109,7 @@ Tips
 To run a subset of tests::
 
 
-    $ python -m unittest tests.test_visnet
+    $ python -m unittest tests.test_magnets
 
 Deploying
 ---------

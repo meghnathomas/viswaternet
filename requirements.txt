@@ -1,6 +1,9 @@
 pandas
+openpyxl 
 numpy
 matplotlib>=3.5.0
 wntr
 imageio
-networkx
+imageio-ffmpeg
+networkx>=2.7
+sphinx_rtd_theme
