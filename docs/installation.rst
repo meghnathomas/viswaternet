@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install viswaternet, run this command in your terminal:
+To install VisWaterNet, run this command in your terminal:
 
 .. code-block:: console
 
     $ pip install viswaternet
 
-This is the preferred method to install viswaternet, as it will always install the most recent stable release.
+This is the preferred method to install VisWaterNet, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for viswaternet can be downloaded from the `Github repo`_.
+The sources for VisWaterNet can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
@@ -49,3 +49,19 @@ Once you have a copy of the source, you can install it with:
 
 .. _Github repo: https://github.com/tylertrimble/viswaternet
 .. _tarball: https://github.com/tylertrimble/viswaternet/tarball/master
+
+
+Dependencies
+--------------
+
+VisWaterNet relies on the following dependencies:
+
+* WNTR <0.5.0
+* Numpy
+* Pandas
+* Matplotlib 3.5.0+
+* NetworkX 2.7+
+* imageio
+
+and has been tested on Python 3.8 and 3.9.
+
