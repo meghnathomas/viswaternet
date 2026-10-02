@@ -1,597 +1,344 @@
-# -*- coding: utf-8 -*-
 """
-Created on Sun Oct  2 21:05:57 2022
+The viswaternet.drawing.continuous module handles everything related to continuous data drawing.
+"""
 
-@author: Tyler
-"""
-import numpy as np
-import matplotlib as mpl
-import networkx.drawing.nx_pylab as nxp
+import matplotlib.pyplot as plt
 from viswaternet.network import processing
-from viswaternet.utils import save_fig, normalize_parameter, unit_conversion
+from viswaternet.utils import save_fig, unit_conversion, \
+    fancyarrowpatch_to_linecollection, label_generator
 from viswaternet.drawing import base
 
 
-default_cmap = mpl.cm.get_cmap("autumn_r")
-
-
-def draw_nodes(
-    self,
-    ax,
-    node_list,
-    parameter_results=None,
-    vmin=None,
-    vmax=None,
-    node_size=None,
-    node_color="k",
-    cmap="tab10",
-    node_shape=".",
-    edge_colors="k",
-    line_widths=0,
-    label=None,
-):
-    model=self.model
-    if parameter_results is None:
-        parameter_results = []
-    if node_size is None:
-        node_size = []
-    if len(parameter_results) != 0:
-
-        negativeValues = False
-    if isinstance(node_size, list) and len(node_size) == 0:
-
-        node_size = np.ones(len(node_list)) * 100
-    if isinstance(node_size, int):
-        node_size = np.ones(len(node_list)) * node_size
-    if len(parameter_results) != 0:
-        for value in parameter_results:
-
-            if value < -1e-5:
-
-                negativeValues = True
-
-                cmap = mpl.cm.get_cmap(cmap)
-
-                if vmin is None and vmax is None:
-                    g = nxp.draw_networkx_nodes(
-                        model["G"],
-                        model["pos_dict"],
-                        ax=ax,
-                        nodelist=node_list,
-                        node_size=node_size,
-                        node_color=parameter_results,
-                        vmax=np.max(parameter_results),
-                        vmin=-np.max(parameter_results),
-                        cmap=cmap,
-                        node_shape=node_shape,
-                        linewidths=line_widths,
-                        edgecolors=edge_colors,
-                        label=label,
-                    )
-                else:
-                    g = nxp.draw_networkx_nodes(
-                        model["G"],
-                        model["pos_dict"],
-                        ax=ax,
-                        nodelist=node_list,
-                        node_size=node_size,
-                        node_color=parameter_results,
-                        vmax=vmax,
-                        vmin=vmin,
-                        cmap=cmap,
-                        node_shape=node_shape,
-                        linewidths=line_widths,
-                        edgecolors=edge_colors,
-                        label=label,
-                    )
-                return g
-        if negativeValues:
-            pass
-        else:
-            cmap = mpl.cm.get_cmap(cmap)
-
-            if vmin is None and vmax is None:
-                g = nxp.draw_networkx_nodes(
-                    model["G"],
-                    model["pos_dict"],
-                    ax=ax,
-                    nodelist=node_list,
-                    node_size=node_size,
-                    node_color=parameter_results,
-                    cmap=cmap,
-                    node_shape=node_shape,
-                    linewidths=line_widths,
-                    edgecolors=edge_colors,
-                )
-            else:
-                g = nxp.draw_networkx_nodes(
-                    model["G"],
-                    model["pos_dict"],
-                    ax=ax,
-                    nodelist=node_list,
-                    node_size=node_size,
-                    node_color=parameter_results,
-                    cmap=cmap,
-                    node_shape=node_shape,
-                    linewidths=line_widths,
-                    edgecolors=edge_colors,
-                    vmin=vmin,
-                    vmax=vmax,
-                )
-            return g
-    else:
-
-        nxp.draw_networkx_nodes(
-            model["G"],
-            model["pos_dict"],
-            ax=ax,
-            nodelist=node_list,
-            node_size=node_size,
-            node_color=node_color,
-            node_shape=node_shape,
-            edgecolors=edge_colors,
-            linewidths=line_widths,
-            label=label,
-        )
-
-
-def draw_links(
-    self,
-    ax,
-    link_list,
-    parameter_results=None,
-    edge_color="k",
-    cmap="tab10",
-    widths=None,
-    vmin=None,
-    vmax=None,
-    link_style='-',
-    link_arrows=False
-):
-    model=self.model
-    if parameter_results is None:
-        parameter_results = []
-    if widths is None:
-        widths = []
-    
-    if isinstance(widths, list) and len(widths) == 0:
-
-        widths = np.ones(len(widths)) * 100
-        
-    if isinstance(widths, int):
-        widths = np.ones(len(link_list)) * widths
-        
-    edgeList = {}
-
-    if len(widths) == 0:
-
-        widths = np.ones(len(link_list)) * 1
-    negativeValues = False
-
-    if len(parameter_results) != 0:
-        for i in link_list:
-            edgeList[i] = model["G_pipe_name_list"].index(i)
-        for value in parameter_results:
-
-            if value < -1e-5:
-
-                negativeValues = True
-
-                cmap = mpl.cm.get_cmap(cmap)
-
-                if vmin is None and vmax is None:
-                    g = nxp.draw_networkx_edges(
-                        model["G"],
-                        model["pos_dict"],
-                        ax=ax,
-                        edgelist=([model["pipe_list"][i] for i in edgeList.values()]),
-                        edge_color=parameter_results,
-                        edge_vmax=np.max(parameter_results),
-                        edge_vmin=-np.max(parameter_results),
-                        edge_cmap=cmap,
-                        style=link_style,
-                        arrows=link_arrows,
-                        width=widths,
-                    )
-                else:
-                    g = nxp.draw_networkx_edges(
-                        model["G"],
-                        model["pos_dict"],
-                        ax=ax,
-                        edgelist=([model["pipe_list"][i] for i in edgeList.values()]),
-                        edge_color=parameter_results,
-                        edge_vmax=vmax,
-                        edge_vmin=vmin,
-                        edge_cmap=cmap,
-                        style=link_style,
-                        arrows=link_arrows,
-                        width=widths,
-                    )
-                return g
-        if negativeValues:
-            pass
-        else:
-            cmap = mpl.cm.get_cmap(cmap)
-
-            if vmin is None and vmax is None:
-                g = nxp.draw_networkx_edges(
-                    model["G"],
-                    model["pos_dict"],
-                    ax=ax,
-                    edgelist=([model["pipe_list"][i] for i in edgeList.values()]),
-                    edge_color=parameter_results,
-                    edge_cmap=cmap,
-                    style=link_style,
-                    arrows=link_arrows,
-                    width=widths,
-                )
-            else:
-                g = nxp.draw_networkx_edges(
-                    model["G"],
-                    model["pos_dict"],
-                    ax=ax,
-                    edgelist=([model["pipe_list"][i] for i in edgeList.values()]),
-                    edge_color=parameter_results,
-                    edge_cmap=cmap,
-                    style=link_style,
-                    arrows=link_arrows,
-                    width=widths,
-                    edge_vmin=vmin,
-                    edge_vmax=vmax
-                )
-            return g
-    else:
-        for i in link_list:
-            edgeList[i] = model["G_pipe_name_list"].index(i)
-        nxp.draw_networkx_edges(
-            model["G"],
-            model["pos_dict"],
-            ax=ax,
-            edgelist=([model["pipe_list"][i] for i in edgeList.values()]),
-            edge_color=edge_color,
-            style=link_style,
-            arrows=link_arrows,
-            width=widths,
-        )
-
-
 def plot_continuous_nodes(
-    self,
-    ax,
-    parameter=None,
-    element_list=None,
-    value=None,
-    unit=None,
-    vmin=None,
-    vmax=None,
-    get_tanks=False,
-    get_reservoirs=False,
-    tanks=True,
-    reservoirs=True,
-    pumps=True,
-    valves=True,
-    cmap=default_cmap,
-    color_bar_title=None,
-    node_size=100,
-    min_size=None,
-    max_size=None,
-    node_shape=".",
-    edge_colors=None,
-    line_widths=None,
-    legend=True,
-    legend_loc="upper right",
-    legend_title=None,
-    savefig=True,
-    save_name=None,
-    dpi='figure',
-    save_format='png',
-    font_size=15,
-    font_color='k',
-    legend_title_font_size=17,
-    draw_frame=False,
-    legend_sig_figs=3,
-    element_size_intervals=None,
-    element_size_legend_title=None,
-    element_size_legend_loc=None,
-    element_size_legend_labels=None,
-    draw_base_legend=True,
-    draw_intervals_legend=True,
-    reservoir_size=150,
-    reservoir_color='b',
-    reservoir_shape='s',
-    reservoir_border_color='k',
-    reservoir_border_width=3,
-    tank_size=200,
-    tank_color='b',
-    tank_shape='h',
-    tank_border_color='k',
-    tank_border_width=2,
-    valve_size=200,
-    valve_color='orange',
-    valve_shape='P',
-    valve_border_color='k',
-    valve_border_width=1,
-    pump_color='b',
-    pump_width=3,
-    pump_line_style='-',
-    pump_arrows=False,
-    base_node_color='k',
-    base_node_size=30,
-    base_link_color='k',
-    base_link_width=1,
-    base_link_line_style='-',
-    base_link_arrows=False,
-    draw_color_bar=True,
-):
-    """Plots continuous Nodes.
-    Arguments:
-    figsize: Figure size. Takes a 2-element List.
-    parameter: Takes String. The name of the parameter.
-    value: Takes Integer. Parameters from results must include a value
-    with it. The value given is the value index, not time.
-    reservoirs: Takes Boolean. Determines whether to draw reservoirs or not.
-    tanks: Takes Boolean. Determines whether to draw tanks or not.
-    pumps: Takes Boolean. Determines whether to draw pumps or not.
-    valves: Takes Boolean. Determines whether to draw valves or not.
-    legend: Takes Boolean. Determines whether to draw legend or not.
-    legend_title: Takes string. Title of legend.
-    legend_loc_1: Takes String. Location of legend.
-    savefig: Takes Boolean. Determines if figure is saved or not.
-    save_name: Takes string. SaveName acts as a prefix for the image file name,
-    and is followed by the name of the network.
-    specialData: Takes either Excel file or correctly formatted dictionary.
-    Used to plot custom data."""
-
+        self,
+        ax=None,
+        parameter=None,
+        element_list=None,
+        include_tanks=False,
+        include_reservoirs=False,
+        value=None,
+        unit=None,
+        vmin=None,
+        vmax=None,
+        draw_nodes=False,
+        element_size_intervals=None,
+        element_size_legend_title=None,
+        element_size_legend_loc=None,
+        element_size_legend_labels=None,
+        color_bar_title=None,
+        savefig=False,
+        save_name=None,
+        style=None):
+    
+    """User-level function that draws continuous nodal data, base elements, legends, and saves the figure.
+    
+    Arguments
+    ---------
+    ax : axes._subplots.AxesSubplot
+        Matplotlib axes object.
+    
+    parameter : string
+        The parameter to be plotted. The following is a list of parameters available to use:
+        **Static Parameters**    
+        - base_demand
+        - elevation
+        - emitter_coefficient
+        - initial_quality
+        
+        **Time-Dependent Parameters**
+        - head
+        - demand
+        - pressure
+        - quality
+        - leak_demand
+        - leak_area
+        - leak_discharg_coeff
+    
+    element_list : list
+        A list of junctions for which the parameter will be plotted. By default, this is the list of all junction names.
+    
+    include_tanks : boolean
+        Determines if data for draw_tanks are retrieved.
+    
+    include_reservoirs : boolean
+        Determines if data for draw_reservoirs are retrieved.
+    
+    value : integer, string
+        For time-varying parameters only. Specifies which timestep or data
+        summary will be plotted.
+        
+        .. rubric:: Possible Inputs
+        
+        ======================= =========================================
+            int                 Plots element data for specified timestep
+            'min'               Plots minimum data point for each element
+            'max'               Plots maximum data point for each element
+            'mean'              Plots mean for each element
+            'stddev'            Plots standard deviation for each element
+            'range'             Plots range for each element
+        ======================= =========================================
+    
+    unit : string
+        The unit that the network data is to be converted to.
+    
+    vmin : integer
+        The minimum value of the color bar. 
+    
+    vmax : integer
+        The maximum value of the color bar.
+    
+    element_size_intervals : integer
+        The number of intervals to be used if an element size legend is used.
+    
+    element_size_legend_title : string
+        The title of the element size legend.
+    
+    element_size_legend_loc : string
+        The location of the element size legend on the figure.
+    
+    element_size_legend_labels : array-like
+        The labels of each interval of the element size legend.
+        
+    color_bar_title : string
+         The title of the color bar.
+         
+    savefig : boolean
+        Determines if the figure is saved. 
+    
+    save_name : string
+        The inputted string will be appended to the name of the network.
+    
+        Example
+        -------
+        >>>import viswaternet as vis
+        >>>model = vis.VisWNModel(r'Networks/Net3.inp')
+        ...
+        >>>model.save_fig(save_name='_example')
+        <Net3_example.png>
+    """
+    if style is None:
+        style = self.default_style
+    args = style.args
+    draw_color_bar = args['draw_color_bar']
+    if ax is None:
+        fig, ax = plt.subplots(figsize=self.figsize)
+        self.fig = fig
+        self.ax = ax
+        ax.set_frame_on(self.axis_frame)
     if parameter is not None:
-
-        parameter_results, node_list = processing.get_parameter(
-            self,
-            "node",
-            parameter,
-            value=value,
-            element_list=element_list,
-            tanks=get_tanks,
-            reservoirs=get_reservoirs,
-        )
-
+        if not isinstance(value, list):
+            parameter_results, node_list = processing.get_parameter(
+                self,
+                "node",
+                parameter,
+                value=value,
+                element_list=element_list,
+                include_tanks=include_tanks,
+                include_reservoirs=include_reservoirs)
+        else:
+            parameter_results = value[0]
+            node_list = value[1]
         if unit is not None:
-            parameter_results = unit_conversion(parameter_results, parameter, unit)
-        if min_size is not None and max_size is not None:
-            normalized_parameter = normalize_parameter(
-                self, parameter_results, min_size, max_size
-            )
-
-            node_size = normalized_parameter
-            
-        g = draw_nodes(
+            parameter_results = unit_conversion(
+                parameter_results, parameter, unit)
+        g = base.draw_nodes(
             self,
             ax,
             node_list,
             parameter_results=parameter_results,
             vmin=vmin,
             vmax=vmax,
-            node_size=node_size,
-            cmap=cmap,
-            node_shape=node_shape,
-            edge_colors=edge_colors,
-            line_widths=line_widths,
-        )
+            style=style)
 
         base.draw_base_elements(
             self,
             ax,
-            nodes=False,
-            reservoirs=reservoirs,
-            tanks=tanks,
-            valves=valves,
-            pumps=pumps,
-            reservoir_size=reservoir_size,
-            reservoir_color=reservoir_color,
-            reservoir_shape=reservoir_shape,
-            reservoir_border_color=reservoir_border_color,
-            reservoir_border_width=reservoir_border_width,
-            tank_size=tank_size,
-            tank_color=tank_color,
-            tank_shape=tank_shape,
-            tank_border_color=tank_border_color,
-            tank_border_width=tank_border_width,
-            valve_size=valve_size,
-            valve_color=valve_color,
-            valve_shape=valve_shape,
-            valve_border_color=valve_border_color,
-            valve_border_width=valve_border_width,
-            pump_color=pump_color,
-            pump_width=pump_width,
-            pump_line_style=pump_line_style,
-            pump_arrows=pump_arrows,
-            base_node_color=base_node_color,
-            base_node_size=base_node_size,
-            base_link_color=base_link_color,
-            base_link_width=base_link_width,
-            base_link_line_style=base_link_line_style,
-            base_link_arrows=base_link_arrows
-        )
-        if draw_color_bar == True:
-            base.draw_color_bar(ax, g, cmap, color_bar_title=color_bar_title)
-    if legend:
-
-        base.draw_legend(ax, 
-                         title=legend_title, 
-                         pumps=pumps, 
-                         loc=legend_loc,
-                         font_size=font_size,
-                         font_color=font_color,
-                         legend_title_font_size=legend_title_font_size,
-                         draw_frame=draw_frame,
-                         pump_color=pump_color,
-                         base_link_color=base_link_color,
-                         node_sizes=node_size,
-                         element_size_intervals=element_size_intervals,
-                         element_size_legend_title=element_size_legend_title,
-                         element_size_legend_loc=element_size_legend_loc,
-                         element_size_legend_labels=element_size_legend_labels,
-                         draw_base_legend= draw_base_legend,
-                         draw_intervals_legend=draw_intervals_legend,
-                         linewidths=line_widths,
-                         edgecolors=edge_colors,
-                         )
+            element_list=node_list,
+            draw_originator='node',
+            style=style)
+        if draw_color_bar is True:
+            if color_bar_title is None:
+                color_bar_title = label_generator(parameter, value, unit)
+            base.draw_color_bar(self,
+                                ax,
+                                g,
+                                color_bar_title=color_bar_title,
+                                style=style)
+    base.draw_legend(self,
+                     ax,
+                     element_size_intervals=element_size_intervals,
+                     element_size_legend_title=element_size_legend_title,
+                     element_size_legend_loc=element_size_legend_loc,
+                     element_size_legend_labels=element_size_legend_labels,
+                     style=style)
     if savefig:
-
-        save_fig(self, save_name=save_name,dpi=dpi,save_format=save_format)
+        save_fig(self, save_name=save_name, style=style)
 
 
 def plot_continuous_links(
-    self,
-    ax,
-    parameter=None,
-    element_list=None,
-    value=None,
-    unit=None,
-    widths=1,
-    min_width=None,
-    max_width=None,
-    vmin=None,
-    vmax=None,
-    link_style='-',
-    link_arrows=False,
-    tanks=True,
-    reservoirs=True,
-    pumps=True,
-    valves=True,
-    cmap=default_cmap,
-    color_bar_title=None,
-    legend=True,
-    legend_loc="upper right",
-    legend_title=None,
-    savefig=True,
-    save_name=None,
-    dpi='figure',
-    save_format='png',
-    font_size=15,
-    font_color='k',
-    legend_title_font_size=17,
-    draw_frame=False,
-    legend_sig_figs=3,
-    link_sizes=None,
-    element_size_intervals=None,
-    element_size_legend_title=None,
-    element_size_legend_loc=None,
-    element_size_legend_labels=None,
-    draw_base_legend=True,
-    draw_intervals_legend=True,
-    reservoir_size=150,
-    reservoir_color='b',
-    reservoir_shape='s',
-    reservoir_border_color='k',
-    reservoir_border_width=3,
-    tank_size=200,
-    tank_color='b',
-    tank_shape='h',
-    tank_border_color='k',
-    tank_border_width=2,
-    valve_size=200,
-    valve_color='orange',
-    valve_shape='P',
-    valve_border_color='k',
-    valve_border_width=1,
-    pump_color='b',
-    pump_width=3,
-    pump_line_style='-',
-    pump_arrows=False,
-    base_node_color='k',
-    base_node_size=30,
-    base_link_color='k',
-    base_link_width=1,
-    base_link_line_style='-',
-    base_link_arrows=False,
-    draw_color_bar=True,
-):
-
+        self,
+        ax=None,
+        parameter=None,
+        element_list=None,
+        include_pumps=True,
+        include_valves=True,
+        value=None,
+        unit=None,
+        vmin=None,
+        vmax=None,
+        draw_nodes=False,
+        savefig=False,
+        save_name=None,
+        element_size_intervals=None,
+        element_size_legend_title=None,
+        element_size_legend_loc=None,
+        element_size_legend_labels=None,
+        color_bar_title=None,
+        style=None):
+    """User-level function that draws continuous link data, base elements, legends, and saves the figure.
+    
+    Arguments
+    ---------
+    ax : axes._subplots.AxesSubplot
+        Matplotlib axes object.
+    
+    parameter : string
+        The parameter to be plotted. The following is a list of parameters
+        available to use:
+        **Static Parameters**    
+        - length
+        - minor_loss
+        - bulk_coeff
+        - wall_coeff
+        
+        **Time-Dependent Parameters**
+        - flowrate
+        - velocity
+        - headloss
+        - friction_factor
+        - reaction_rate
+        - quality
+   
+    element_list : list
+        A list of links for which the parameter will be plotted. By default, this is the list of all link names.
+    
+    include_pumps : boolean
+        Determines if data for draw_pumps are retreived.
+    
+    include_valves : boolean
+        Determines if data for draw_valves are retrieved
+    
+    value : integer, string
+        For time-varying parameters only. Specifies which timestep or data summary will be plotted.
+        
+        .. rubric:: Possible Inputs
+        
+        ======================= =========================================
+            int                 Plots element data for specified timestep
+            'min'               Plots minimum data point for each element
+            'max'               Plots maximum data point for each element
+            'mean'              Plots mean for each element
+            'stddev'            Plots standard deviation for each element
+            'range'             Plots range for each element
+        ======================= =========================================
+    
+    unit : string
+        The unit that the network data is to be converted to.
+    
+    vmin : integer
+        The minimum value of the color bar. 
+    
+    vmax : integer
+        The maximum value of the color bar.
+    
+    element_size_intervals : integer
+        The number of intervals to be used if an element size legend is used.
+    
+    element_size_legend_title : string
+        The title of the element size legend.
+   
+    element_size_legend_loc : string
+        The location of the element size legend on the figure.
+    
+    element_size_legend_labels : array-like
+        The labels of each interval of the element size legend.
+    
+    color_bar_title : string
+         The title of the color bar.
+         
+    savefig : boolean
+        Determines if the figure is saved. 
+    
+    save_name : string
+        The inputted string will be appended to the name of the network.
+        
+        Example
+        -------
+        >>>import viswaternet as vis
+        >>>model = vis.VisWNModel(r'Networks/Net3.inp')
+        ...
+        >>>model.save_fig(save_name='_example')
+        <Net3_example.png>
+    """
+    if style is None:
+        style = self.default_style
+    args = style.args
+    link_arrows = args['link_arrows']
+    cmap = args['cmap']
+    draw_color_bar = args['draw_color_bar']
+    if ax is None:
+        if ax is None:
+            fig, ax = plt.subplots(figsize=self.figsize)
+            ax.set_frame_on(self.axis_frame)
     if parameter is not None:
-
-        parameter_results, link_list = processing.get_parameter(
-            self, "link", parameter, value=value,element_list=element_list
-        )
-
+        if not isinstance(value, list):
+            parameter_results, link_list = processing.get_parameter(
+                self,
+                "link",
+                parameter,
+                value=value,
+                element_list=element_list,
+                include_pumps=include_pumps,
+                include_valves=include_valves)
+        else:
+            parameter_results = value[0]
+            link_list = value[1]
         if unit is not None:
-            parameter_results = unit_conversion(parameter_results, parameter, unit)
-        normalized_parameter = normalize_parameter(
-            self, parameter_results, min_width, max_width
-        )
-
-        widths = normalized_parameter
-
-        g = draw_links(
+            parameter_results = unit_conversion(
+                parameter_results, parameter, unit)
+        g = base.draw_links(
             self,
             ax,
             link_list,
             parameter_results=parameter_results,
-            cmap=cmap,
-            widths=widths,
             vmin=vmin,
             vmax=vmax,
-            link_style=link_style,
-            link_arrows=link_arrows,
-        )
+            style=style)
 
         base.draw_base_elements(
             self,
             ax,
-            nodes=False,
-            links=False,
-            reservoirs=reservoirs,
-            tanks=tanks,
-            valves=valves,
-            pumps=pumps,
-            reservoir_size=reservoir_size,
-            reservoir_color=reservoir_color,
-            reservoir_shape=reservoir_shape,
-            reservoir_border_color=reservoir_border_color,
-            reservoir_border_width=reservoir_border_width,
-            tank_size=tank_size,
-            tank_color=tank_color,
-            tank_shape=tank_shape,
-            tank_border_color=tank_border_color,
-            tank_border_width=tank_border_width,
-            valve_size=valve_size,
-            valve_color=valve_color,
-            valve_shape=valve_shape,
-            valve_border_color=valve_border_color,
-            valve_border_width=valve_border_width,
-            pump_color=pump_color,
-            pump_width=pump_width,
-            pump_line_style=pump_line_style,
-            pump_arrows=pump_arrows,
-            base_node_color=base_node_color,
-            base_node_size=base_node_size,
-            base_link_color=base_link_color,
-            base_link_width=base_link_width,
-            base_link_line_style=base_link_line_style,
-            base_link_arrows=base_link_arrows
-        )
-        if draw_color_bar == True:
-            base.draw_color_bar(ax, g, cmap, color_bar_title=color_bar_title)
-        
-    if legend:
-
-        base.draw_legend(ax, 
-                         title=legend_title, 
-                         pumps=pumps, 
-                         loc=legend_loc,
-                         font_size=font_size,
-                         font_color=font_color,
-                         legend_title_font_size=legend_title_font_size,
-                         draw_frame=draw_frame,
-                         pump_color=pump_color,
-                         base_link_color=base_link_color,
-                         link_sizes=widths,
-                         element_size_intervals=element_size_intervals,
-                         element_size_legend_title=element_size_legend_title,
-                         element_size_legend_loc=element_size_legend_loc,
-                         element_size_legend_labels=element_size_legend_labels,
-                         draw_base_legend= draw_base_legend,
-                         draw_intervals_legend=draw_intervals_legend
-                         )
+            draw_nodes=draw_nodes,
+            element_list=link_list,
+            draw_originator='link',
+            style=style)
+        if link_arrows is True:
+            g = fancyarrowpatch_to_linecollection(
+                g, cmap, vmin, vmax, parameter_results)
+        if draw_color_bar is True:
+            if color_bar_title is None:
+                color_bar_title = label_generator(parameter, value, unit)
+            base.draw_color_bar(self,
+                                ax,
+                                g,
+                                color_bar_title=color_bar_title,
+                                style=style)
+    base.draw_legend(self,
+                     ax,
+                     element_size_intervals=element_size_intervals,
+                     element_size_legend_title=element_size_legend_title,
+                     element_size_legend_loc=element_size_legend_loc,
+                     element_size_legend_labels=element_size_legend_labels,
+                     style=style)
     if savefig:
-
-        save_fig(self, save_name=save_name,dpi=dpi,save_format=save_format)
+        save_fig(self, save_name=save_name, style=style)
